@@ -139,3 +139,63 @@ python migrate.py downgrade
 ```bash
 python migrate.py list
 ```
+
+---
+
+## My Implementation
+
+### Database Schema
+
+**Products & Clients** (Seed Data - 5 sample clients and 8 sample products included)
+```
+products: id, name, price
+clients: id, name, address, company_registration_no
+```
+
+**Invoices** (Generated with auto-incrementing invoice numbers: INV-001, INV-002, etc.)
+```
+invoices: id, invoice_no, issue_date, due_date, client_id, address, tax, total
+invoice_items: id, invoice_id, product_id, quantity, unit_price, subtotal
+```
+
+### API Endpoints
+
+| Endpoint | Method | Purpose | Returns |
+|----------|--------|---------|---------|
+| `/invoices` | POST | Create a new invoice | Full invoice details (INV-001, etc.) |
+| `/invoices` | GET | List all invoices | Array of invoice summaries (without items) |
+| `/invoices/{id}` | GET | Get invoice details | Complete invoice with all items |
+| `/invoices/{id}` | DELETE | Delete an invoice | 204 No Content |
+
+### Example API Calls
+
+**Create Invoice (POST)**
+```bash
+curl -X POST http://localhost:8000/invoices \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client_id": 1,
+    "issue_date": "2024-02-08",
+    "due_date": "2024-03-08",
+    "tax": 500,
+    "items": [
+      {"product_id": 1, "quantity": 2},
+      {"product_id": 3, "quantity": 1}
+    ]
+  }'
+```
+
+**List All Invoices (GET)**
+```bash
+curl http://localhost:8000/invoices
+```
+
+**Get Invoice Details (GET)**
+```bash
+curl http://localhost:8000/invoices/1
+```
+
+**Delete Invoice (DELETE)**
+```bash
+curl -X DELETE http://localhost:8000/invoices/1
+```
